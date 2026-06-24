@@ -86,7 +86,7 @@ function DesktopSubItem({ navLink }: { navLink: CMSNavLink }) {
         )}
         <ChevronRight className="ml-2 size-3.5 shrink-0" />
       </div>
-      <div className="invisible absolute left-full top-0 z-50 ml-1 min-w-[12rem] rounded-md border border-border bg-popover/70 backdrop-blur-xl p-1 opacity-0 shadow-md transition-all group-hover/sub:visible group-hover/sub:opacity-100">
+      <div className="invisible absolute left-full top-0 z-50 ml-1 min-w-[16rem] rounded-md border border-border bg-popover/70 backdrop-blur-xl p-1 opacity-0 shadow-md transition-all group-hover/sub:visible group-hover/sub:opacity-100">
         {navLink.children!.map((child) => {
           const childLink = child.link;
           if (!childLink.url || !childLink.label) return null;
@@ -118,14 +118,14 @@ function DesktopDropdownItem({ navLink }: { navLink: CMSNavLink }) {
         label={link.label}
         url={link.url}
         newTab={link.newTab}
-        className="block rounded-md px-3 py-2 text-base text-foreground hover:bg-muted hover:underline transition-colors"
+        className="block rounded-md px-3 py-2 mx-8 text-2xl text-foreground w-full hover:bg-muted hover:underline transition-colors"
       />
     );
   }
 
   return (
     <div className="group/sub relative">
-      <div className="flex items-center justify-between rounded-md px-3 py-2 text-base text-foreground hover:bg-muted hover:underline transition-colors">
+      <div className="flex items-center justify-between rounded-md px-3 py-2 text-base text-red-500 hover:bg-muted hover:underline transition-colors">
         {link.url ? (
           <NavLinkAnchor
             label={link.label}
@@ -160,14 +160,14 @@ function DesktopNavItem({ navLink }: { navLink: CMSNavLink }) {
         label={link.label}
         url={link.url}
         newTab={link.newTab}
-        className="text-2xl font-medium text-foreground underline-offset-4 hover:underline transition-colors"
+        className="text-2xl font-medium text-foreground underline-offset-4 hover:underline transition-colors whitespace-nowrap"
       />
     );
   }
 
   return (
     <div className="group relative">
-      <div className="flex items-center gap-1 text-lg font-bold text-foreground underline-offset-4 hover:underline transition-colors cursor-default">
+      <div className="flex items-center gap-1 text-lg font-bold text-foreground underline-offset-4 hover:underline transition-colors cursor-default whitespace-nowrap">
         {link.url ? (
           <NavLinkAnchor
             label={link.label}
@@ -180,7 +180,7 @@ function DesktopNavItem({ navLink }: { navLink: CMSNavLink }) {
         )}
         <ChevronDown className="size-3.5 transition-transform group-hover:rotate-180" />
       </div>
-      <div className="invisible absolute left-0 top-full z-50 mt-1 min-w-[12rem] rounded-md border border-border bg-popover/70 backdrop-blur-xl p-1 opacity-0 shadow-md transition-all group-hover:visible group-hover:opacity-100">
+      <div className="invisible absolute left-0 top-8 z-50 mt-1 min-w-[12rem] ml-8 rounded-md border border-border bg-popover/70 backdrop-blur-xl p-1 opacity-0 shadow-md transition-all group-hover:visible group-hover:opacity-100">
         {navLink.children!.map((child) => (
           <DesktopDropdownItem
             key={child.id ?? child.link.label}
@@ -255,103 +255,100 @@ export function Navbar() {
   const navLinks = header?.navLinks ?? [];
 
   return (
-    <header className="sticky top-0 flex justify-center items-center z-40 w-full border-b border-white/[3%] bg-background/70 backdrop-blur-xl shadow-lg">
-      <div className="flex h-16 w-10/12 items-center px-16 sm:px-6 lg:px-8">
+    <header className="sticky px-8 top-0 flex justify-center items-center w-full border-b border-white/[3%] bg-background/70 backdrop-blur-xl shadow-lg">
+      <div className="flex h-16 items-center gap-4 mx-auto max-w-screen-2xl w-full">
         {/* Left 1/3: Logo */}
-        <div className="flex w-1/3 items-center">
+        <div className="flex items-center shrink-0">
           {header?.logo?.url ? (
             <Link to="/">
               <img
                 src={header.logo.url}
                 alt={header.logo.alt ?? "Logo"}
-                className="h-10 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
             </Link>
           ) : null}
         </div>
 
-        {/* Right 2/3: Nav links + Contact + Mobile nav */}
-        <div className="flex w-2/3 items-center justify-end gap-6">
-          <nav className="hidden items-center gap-6 justify-end md:flex">
-            {isLoading ? (
-              <>
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-20" />
-              </>
-            ) : isError ? (
-              <span className="text-sm text-muted-foreground">
-                Nav unavailable
-              </span>
-            ) : navLinks.length === 0 ? (
-              <span className="text-sm text-muted-foreground">
-                No nav configured
-              </span>
-            ) : (
-              navLinks.map((navLink) => (
-                <DesktopNavItem
-                  key={navLink.id ?? navLink.link.label}
-                  navLink={navLink}
-                />
-              ))
-            )}
-          </nav>
-          <div className="hidden md:block">
-            <a
-              href="/contact"
-              className="rounded-full text-xl h-8 w-32 px-8 py-3 border border-primary bg-transparent text-foreground hover:bg-primary hover:text-background inline-flex items-center justify-center whitespace-nowrap gap-2"
-            >
-              Contact
-              <ArrowRight className="size-5" />
-            </a>
-          </div>
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger
-                render={
-                  <Button variant="ghost" size="icon">
-                    <Menu className="size-5" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                }
+        <nav className="hidden md:flex items-center justify-center gap-6 flex-1">
+          {isLoading ? (
+            <>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-20" />
+            </>
+          ) : isError ? (
+            <span className="text-sm text-muted-foreground">
+              Nav unavailable
+            </span>
+          ) : navLinks.length === 0 ? (
+            <span className="text-sm text-muted-foreground">
+              No nav configured
+            </span>
+          ) : (
+            navLinks.map((navLink) => (
+              <DesktopNavItem
+                key={navLink.id ?? navLink.link.label}
+                navLink={navLink}
               />
-              <SheetContent side="right">
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col px-4">
-                  {isLoading ? (
-                    <>
-                      <Skeleton className="h-6 w-full" />
-                      <Skeleton className="h-6 w-full" />
-                      <Skeleton className="h-6 w-full" />
-                    </>
-                  ) : (
-                    navLinks.map((navLink) => (
-                      <MobileNavItem
-                        key={navLink.id ?? navLink.link.label}
-                        navLink={navLink}
-                        level={0}
-                      />
-                    ))
-                  )}
-                </nav>
-                <div className="mt-4 border-t border-border px-4 pt-4">
-                  <SheetClose
-                    render={
-                      <a
-                        href="/contact"
-                        className="block w-full rounded-full border border-primary bg-transparent text-primary py-4 px-8 text-center font-medium whitespace-nowrap"
-                      >
-                        Contact
-                        <ArrowRight className="size-5 inline-block ml-2" />
-                      </a>
-                    }
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+            ))
+          )}
+        </nav>
+        <div className="hidden md:block shrink-0">
+          <a
+            href="/contact"
+            className="rounded-full text-xl h-8 w-32 px-8 py-3 border border-primary bg-transparent text-foreground hover:bg-primary hover:text-background inline-flex items-center justify-center whitespace-nowrap gap-2"
+          >
+            Contact
+            <ArrowRight className="size-5" />
+          </a>
+        </div>
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger
+              render={
+                <Button variant="ghost" size="icon">
+                  <Menu className="size-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              }
+            />
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col px-4">
+                {isLoading ? (
+                  <>
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                  </>
+                ) : (
+                  navLinks.map((navLink) => (
+                    <MobileNavItem
+                      key={navLink.id ?? navLink.link.label}
+                      navLink={navLink}
+                      level={0}
+                    />
+                  ))
+                )}
+              </nav>
+              <div className="mt-4 border-t border-border px-4 pt-4">
+                <SheetClose
+                  render={
+                    <a
+                      href="/contact"
+                      className="block w-full rounded-full border border-primary bg-transparent text-primary py-4 px-8 text-center font-medium whitespace-nowrap"
+                    >
+                      Contact
+                      <ArrowRight className="size-5 inline-block ml-2" />
+                    </a>
+                  }
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
