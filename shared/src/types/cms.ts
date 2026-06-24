@@ -11,8 +11,19 @@ export interface CMSNavLink {
   children?: CMSNavLink[] | null
 }
 
+export interface CMSMedia {
+  id: number
+  url: string
+  alt?: string | null
+  filename?: string
+  mimeType?: string
+  width?: number
+  height?: number
+}
+
 export interface CMSHeader {
   id: number
   title: string
   navLinks?: CMSNavLink[] | null
+  logo?: CMSMedia | null
 }

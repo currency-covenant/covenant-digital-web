@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import type { CMSHeader, CMSNavLink } from "shared"
+import type { CMSHeader, CMSMedia, CMSNavLink } from "shared"
 
 function env(c: { env?: Record<string, unknown> }, key: string): string | undefined {
   return (c.env?.[key] as string | undefined) || process.env[key]
@@ -97,6 +97,17 @@ cmsRoutes.get("/header", async (c) => {
     id: doc.id as number,
     title: (doc.title as string) ?? "",
     navLinks: navLinksRaw.map((item) => mapNavLink(item)),
+    logo: doc.logo
+      ? ({
+          id: (doc.logo as Record<string, unknown>).id as number,
+          url: (doc.logo as Record<string, unknown>).url as string,
+          alt: (doc.logo as Record<string, unknown>).alt as string | null,
+          filename: (doc.logo as Record<string, unknown>).filename as string,
+          mimeType: (doc.logo as Record<string, unknown>).mimeType as string,
+          width: (doc.logo as Record<string, unknown>).width as number,
+          height: (doc.logo as Record<string, unknown>).height as number,
+        } as CMSMedia)
+      : null,
   }
 
   return c.json(header)

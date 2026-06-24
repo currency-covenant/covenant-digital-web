@@ -1,0 +1,11 @@
+name = "covenant-digital-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-10"
+[observability]
+enabled = true
+
+# Environment variable bindings
+[vars]
+CMS_URL = "https://cms.covenantdigital.tech"
+CMS_TENANT_ID = "12"
+ENVIRONMENT = "production"

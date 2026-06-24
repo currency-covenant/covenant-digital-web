@@ -9,11 +9,24 @@ app.use(logger())
 app.use(
   "/*",
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-      ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
-    ],
+    origin: (origin) => {
+      if (
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:")
+      ) {
+        return origin
+      }
+      if (
+        origin === "https://covenantdigital.tech" ||
+        origin === "https://www.covenantdigital.tech"
+      ) {
+        return origin
+      }
+      if (origin.endsWith(".pages.dev")) {
+        return origin
+      }
+      return null
+    },
     allowMethods: ["GET", "POST", "OPTIONS"],
   }),
 )
