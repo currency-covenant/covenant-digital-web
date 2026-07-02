@@ -1,13 +1,16 @@
 import ReactDOM from "react-dom/client"
 import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { hydrateRoot } from "react-dom/client"
 import "./styles/global.css"
 
 const queryClient = new QueryClient()
 
 import { routeTree } from "./routeTree.gen"
 
-const router = createRouter({ routeTree })
+const router = createRouter({
+  routeTree,
+})
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -21,11 +24,15 @@ if (!rootElement) {
   throw new Error("Root element not found")
 }
 
-if (!rootElement.innerHTML) {
+const app = (
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>
+)
+
+if (rootElement.innerHTML) {
+  hydrateRoot(rootElement, app)
+} else {
   const root = ReactDOM.createRoot(rootElement)
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  )
+  root.render(app)
 }
