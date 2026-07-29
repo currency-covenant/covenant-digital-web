@@ -1,14 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useCMSPage } from "@/hooks/server/cms/GET/useCMSPage"
-import { RenderBlock } from "@/components/cms/render-block"
-import { Skeleton } from "@/components/ui/skeleton"
+import { createFileRoute } from "@tanstack/react-router";
+import { useCMSPage } from "@/hooks/server/cms/GET/useCMSPage";
+import { RenderBlock, CTAButton } from "@/components/cms/render-block";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { CMSBlock, CMSCTAButtonBlock } from "shared";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
-})
+});
 
 function HomePage() {
-  const { data: page, isLoading, isError } = useCMSPage("home")
+  const { data: page, isLoading, isError } = useCMSPage("home");
 
   if (isLoading) {
     return (
@@ -17,7 +18,7 @@ function HomePage() {
         <Skeleton className="mt-6 h-6 w-1/2 mx-auto" />
         <Skeleton className="mt-4 h-4 w-1/3 mx-auto" />
       </div>
-    )
+    );
   }
 
   if (isError || !page) {
@@ -32,24 +33,57 @@ function HomePage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
+
+  // eslint-disable-next-line no-console
+  console.log("CMS home page:", page);
+
+  const layout = page.layout ?? [];
+  const heroCtaButtons: CMSCTAButtonBlock[] = [];
+  const remainingBlocks: CMSBlock[] = [];
+
+  let collectingHeroCtas = true;
+  for (const block of layout) {
+    if (collectingHeroCtas && block.blockType === "ctaButton") {
+      heroCtaButtons.push(block as CMSCTAButtonBlock);
+    } else {
+      collectingHeroCtas = false;
+      remainingBlocks.push(block);
+    }
+  }
+
+  const heroRichText = page.hero?.richText ?? "";
+  const hasHeroContent = heroRichText.length > 0;
+  const hasHeroCtas = heroCtaButtons.length > 0;
 
   return (
     <div>
-      {page.hero?.richText && (
-        <section className="w-full">
-          <div className="px-8 text-center">
-            <div
-              className="prose prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: page.hero.richText }}
-            />
-          </div>
-        </section>
+      {(hasHeroContent || hasHeroCtas) && (
+        <div
+          style={{ paddingTop: "120px", paddingBottom: "120px" }}
+          className="w-full flex justify-center bg-black px-8"
+        >
+          <section className="mx-auto flex w-full max-w-screen-2xl flex-col items-center py-16">
+            {hasHeroContent && (
+              <div
+                className="prose prose-invert prose-2xl w-full max-w-none! text-left"
+                dangerouslySetInnerHTML={{ __html: heroRichText }}
+              />
+            )}
+            {hasHeroCtas && (
+              <div style={{paddingTop: "32px"}} className=" flex w-full items-center justify-start gap-6">
+                {heroCtaButtons.map((block, i) => (
+                  <CTAButton key={i} link={block.link} />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
       )}
-      {page.layout?.map((block, i) => (
+      {remainingBlocks.map((block, i) => (
         <RenderBlock key={i} block={block} />
       ))}
     </div>
-  )
+  );
 }

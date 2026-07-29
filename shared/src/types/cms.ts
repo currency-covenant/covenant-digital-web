@@ -1,7 +1,8 @@
 export interface CMSLink {
-  type?: "reference" | "custom" | null
+  type?: "reference" | "custom" | "scroll" | null
   newTab?: boolean | null
   url?: string | null
+  sectionId?: string | null
   label: string
   appearance?: "default" | "outline" | null
 }
@@ -53,6 +54,12 @@ export interface CMSCTABlock {
   richText: string
   links?: CMSCTALink[] | null
   backgroundImage?: CMSMedia | null
+}
+
+export interface CMSCTAButtonBlock {
+  blockType: "ctaButton"
+  title: string
+  link: CMSLink
 }
 
 export interface CMSMediaBlock {
@@ -119,6 +126,7 @@ export interface CMSFormBlock {
 export type CMSBlock =
   | CMSContentBlock
   | CMSCTABlock
+  | CMSCTAButtonBlock
   | CMSMediaBlock
   | CMSProfileBlock
   | CMSProductGridBlock

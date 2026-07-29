@@ -19,6 +19,10 @@ function isExternal(url: string): boolean {
   return url.startsWith("http");
 }
 
+function isHashLink(url: string): boolean {
+  return url.startsWith("#");
+}
+
 function NavLinkAnchor({
   label,
   url,
@@ -30,6 +34,14 @@ function NavLinkAnchor({
   newTab?: boolean | null;
   className?: string;
 }) {
+  if (isHashLink(url)) {
+    return (
+      <a href={url} className={className}>
+        {label}
+      </a>
+    );
+  }
+
   if (isExternal(url)) {
     return (
       <a

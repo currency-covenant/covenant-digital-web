@@ -1,5 +1,10 @@
 import { Hono } from "hono"
-import type { CMSHeader, CMSMedia, CMSNavLink } from "shared"
+import type {
+  CMSHeader,
+  CMSLink,
+  CMSMedia,
+  CMSNavLink,
+} from "shared"
 import { lexicalToHTML } from "./lexical-to-html"
 
 function env(c: { env?: Record<string, unknown> }, key: string): string | undefined {
@@ -77,37 +82,70 @@ function resolveLinkUrl(
   if (linkType === "reference") {
     const reference = linkData.reference as Record<string, unknown> | undefined
     if (reference) {
-      const refSlug = (reference.slug as string) ?? null
-      const refCollectionSlug = (reference.collectionSlug as string) ?? null
+      const relationTo = (reference.relationTo as string) ?? null
+      const value = reference.value as Record<string, unknown> | number | undefined
+      const refSlug =
+        typeof value === "object" && value !== null
+          ? (value.slug as string | undefined) ?? null
+          : null
       if (refSlug) {
-        const prefix = refCollectionSlug === "posts" ? "/blog" : ""
+        const prefix = relationTo === "posts" ? "/blog" : ""
         return { url: `${prefix}/${refSlug}`, label, newTab }
       }
     }
     return { url: null, label, newTab }
   }
 
+  if (linkType === "scroll") {
+    const sectionId = (linkData.sectionId as string) ?? null
+    return { url: sectionId ? `#${sectionId}` : null, label, newTab: false }
+  }
+
   const url = (linkData.url as string) ?? null
   return { url, label, newTab }
 }
 
-function mapNavLink(item: Record<string, unknown>): CMSNavLink {
-  const linkData = (item.link as Record<string, unknown> | undefined) ?? {}
+function resolveLink(linkData: Record<string, unknown>): CMSLink {
   const resolved = resolveLinkUrl(linkData)
   const linkType = (linkData.type as "reference" | "custom") ?? null
+  const appearance = (linkData.appearance as "default" | "outline") ?? null
 
+  return {
+    type: linkType,
+    newTab: resolved.newTab,
+    url: resolved.url,
+    label: resolved.label,
+    appearance,
+  }
+}
+
+function transformLayoutBlocks(
+  blocks: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  return blocks.map((block) => {
+    const blockType = block.blockType as string | undefined
+
+    if (blockType === "ctaButton") {
+      const linkData = (block.link as Record<string, unknown>) ?? {}
+      return {
+        ...block,
+        link: resolveLink(linkData),
+      }
+    }
+
+    return block
+  })
+}
+
+function mapNavLink(item: Record<string, unknown>): CMSNavLink {
+  const linkData = (item.link as Record<string, unknown>) ?? {}
   const childrenRaw = (item.children as Record<string, unknown>[] | undefined) ?? []
   const children: CMSNavLink[] | null =
     childrenRaw.length > 0 ? childrenRaw.map((child) => mapNavLink(child)) : null
 
   return {
     id: (item.id as string) ?? null,
-    link: {
-      type: linkType,
-      newTab: resolved.newTab,
-      url: resolved.url,
-      label: resolved.label,
-    },
+    link: resolveLink(linkData),
     children,
   }
 }
@@ -200,5 +238,11 @@ cmsRoutes.get("/pages/:slug", async (c) => {
   }
 
   const converted = convertRichTextFields(doc, cmsUrl)
+  const layout = (converted.layout as Record<string, unknown>[] | undefined) ?? []
+
+  if (layout.length > 0) {
+    converted.layout = transformLayoutBlocks(layout)
+  }
+
   return c.json(converted)
 })

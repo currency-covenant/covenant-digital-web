@@ -1,0 +1,10 @@
+# Local development environment
+# Copy this file to .dev.vars and adjust values as needed.
+# .dev.vars is loaded automatically by dev.ts when running `bun run dev`.
+
+# CMS Configuration (covenant-digital-cms)
+CMS_URL=http://localhost:3000
+CMS_TENANT_ID=12
+
+# Environment
+ENVIRONMENT=development

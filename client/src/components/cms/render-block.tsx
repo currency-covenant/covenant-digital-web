@@ -1,59 +1,211 @@
-import type { CMSBlock } from "shared"
-import { ArrowRight } from "lucide-react"
+import type { CMSBlock, CMSLink } from "shared";
+import { ArrowRight } from "lucide-react";
 
 export function RenderBlock({ block }: { block: CMSBlock }) {
   switch (block.blockType) {
     case "cta":
-      return <CTABlock block={block} />
+      return <CTABlock block={block} />;
+    case "ctaButton":
+      return <CTAButtonBlock block={block} />;
     case "content":
-      return <ContentBlock block={block} />
+      return <ContentBlock block={block} />;
     case "mediaBlock":
-      return <MediaBlock block={block} />
+      return <MediaBlock block={block} />;
     case "profile":
-      return <ProfileBlock block={block} />
+      return <ProfileBlock block={block} />;
     case "productGrid":
-      return <ProductGridBlock block={block} />
+      return <ProductGridBlock block={block} />;
     case "workGrid":
-      return <WorkGridBlock block={block} />
+      return <WorkGridBlock block={block} />;
     default:
-      return null
+      return null;
   }
 }
 
-function CTABlock({ block }: { block: Extract<CMSBlock, { blockType: "cta" }> }) {
+function CTALinkAnchor({
+  link,
+  className = "inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-foreground hover:bg-primary hover:text-background transition-colors",
+}: {
+  link: CMSLink;
+  className?: string;
+}) {
+  const href = link.url ?? "#";
+  const isHash = href.startsWith("#");
+
+  return (
+    <a
+      href={href}
+      target={!isHash && link.newTab ? "_blank" : undefined}
+      rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
+      className={className}
+    >
+      {link.label}
+      <ArrowRight className="size-4 shrink-0" />
+    </a>
+  );
+}
+
+export function CTAButton({
+  link,
+}: {
+  link: CMSLink;
+}) {
+  const href = link.url ?? "#";
+  const isHash = href.startsWith("#");
+
+  return (
+    <>
+      <style>{`
+        .hero-btn-glow {
+          align-items: center;
+          appearance: none;
+          background-clip: padding-box;
+          background-color: initial;
+          background-image: none;
+          border-style: none;
+          box-sizing: border-box;
+          color: var(--primary-foreground);
+          cursor: pointer;
+          display: inline-flex;
+          flex-direction: row;
+          flex-shrink: 0;
+          font-family: Eina01, sans-serif;
+          font-size: 16px;
+          font-weight: 800;
+          justify-content: center;
+          line-height: 24px;
+          margin: 0;
+          min-height: 64px;
+          outline: none;
+          overflow: visible;
+          padding: 19px 26px;
+          pointer-events: auto;
+          position: relative;
+          text-align: center;
+          text-decoration: none;
+          text-transform: none;
+          user-select: none;
+          -webkit-user-select: none;
+          touch-action: manipulation;
+          vertical-align: middle;
+          width: auto;
+          word-break: keep-all;
+          z-index: 0;
+        }
+        @media (min-width: 768px) {
+          .hero-btn-glow {
+            padding: 19px 32px;
+          }
+        }
+        .hero-btn-glow::before,
+        .hero-btn-glow::after {
+          border-radius: 80px;
+        }
+        .hero-btn-glow::before {
+          background-image: linear-gradient(92.83deg, var(--accent) 0, var(--primary) 100%);
+          content: "";
+          display: block;
+          height: 100%;
+          left: 0;
+          overflow: hidden;
+          position: absolute;
+          top: 0;
+          width: 100%;
+          z-index: -2;
+        }
+        .hero-btn-glow::after {
+          background-color: initial;
+          background-image: linear-gradient(var(--muted) 0, var(--background) 100%);
+          bottom: 4px;
+          content: "";
+          display: block;
+          left: 4px;
+          overflow: hidden;
+          position: absolute;
+          right: 4px;
+          top: 4px;
+          transition: all 100ms ease-out;
+          z-index: -1;
+        }
+        .hero-btn-glow:hover::after {
+          bottom: 0;
+          left: 0;
+          right: 0;
+          top: 0;
+          transition-timing-function: ease-in;
+          opacity: 0;
+        }
+        .hero-btn-glow:active {
+          color: var(--muted-foreground);
+        }
+      `}</style>
+      <a
+        href={href}
+        target={!isHash && link.newTab ? "_blank" : undefined}
+        rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
+        className="hero-btn-glow"
+      >
+        {link.label}
+        <ArrowRight className="size-6 shrink-0" />
+      </a>
+    </>
+  )
+}
+
+function CTAButtonBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "ctaButton" }>;
+}) {
+  const link = block.link
+  const hasUrl = Boolean(link?.url)
+
+  return (
+    <section className="w-full py-16">
+      <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        {hasUrl && link ? (
+          <CTAButton link={link} />
+        ) : (
+          <span className="text-sm text-muted-foreground">
+            {link?.label ? link.label : "CTA link missing"}
+          </span>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function CTABlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "cta" }>;
+}) {
   return (
     <section
       className="relative w-full bg-cover bg-center py-16"
-      style={block.backgroundImage?.url ? { backgroundImage: `url(${block.backgroundImage.url})` } : undefined}
+      style={
+        block.backgroundImage?.url
+          ? { backgroundImage: `url(${block.backgroundImage.url})` }
+          : undefined
+      }
     >
-      {block.backgroundImage?.url && <div className="absolute inset-0 bg-black/50" />}
+      {block.backgroundImage?.url && (
+        <div className="absolute inset-0 bg-black/50" />
+      )}
       <div className="relative px-8">
         <div
           className="prose prose-invert max-w-none text-center"
           dangerouslySetInnerHTML={{ __html: block.richText }}
         />
         {block.links && block.links.length > 0 && (
-          <div className="mt-8 flex flex-col items-center gap-6">
-            <div className="flex justify-center">
-              <a
-                href={block.links[0].link.url ?? "#"}
-                className="inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-foreground hover:bg-primary hover:text-background transition-colors"
-              >
-                {block.links[0].link.label}
-                <ArrowRight className="size-4" />
-              </a>
+          <div className="mt-8 flex w-full flex-col items-center gap-6">
+            <div className="flex justify-center w-full">
+              <CTALinkAnchor link={block.links[0].link} />
             </div>
             {block.links.length > 1 && (
               <div className="flex items-center justify-center gap-4 w-full">
                 {block.links.slice(1).map((link, i) => (
-                  <a
-                    key={i}
-                    href={link.link.url ?? "#"}
-                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-foreground hover:bg-primary hover:text-background transition-colors min-w-0"
-                  >
-                    {link.link.label}
-                    <ArrowRight className="size-4 shrink-0" />
-                  </a>
+                  <CTALinkAnchor key={i} link={link.link} />
                 ))}
               </div>
             )}
@@ -61,10 +213,14 @@ function CTABlock({ block }: { block: Extract<CMSBlock, { blockType: "cta" }> })
         )}
       </div>
     </section>
-  )
+  );
 }
 
-function ContentBlock({ block }: { block: Extract<CMSBlock, { blockType: "content" }> }) {
+function ContentBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "content" }>;
+}) {
   return (
     <section className="w-full py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -79,11 +235,15 @@ function ContentBlock({ block }: { block: Extract<CMSBlock, { blockType: "conten
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function MediaBlock({ block }: { block: Extract<CMSBlock, { blockType: "mediaBlock" }> }) {
-  if (!block.media?.url) return null
+function MediaBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "mediaBlock" }>;
+}) {
+  if (!block.media?.url) return null;
   return (
     <section className="w-full py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -94,10 +254,14 @@ function MediaBlock({ block }: { block: Extract<CMSBlock, { blockType: "mediaBlo
         />
       </div>
     </section>
-  )
+  );
 }
 
-function ProfileBlock({ block }: { block: Extract<CMSBlock, { blockType: "profile" }> }) {
+function ProfileBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "profile" }>;
+}) {
   return (
     <section className="w-full py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -111,15 +275,21 @@ function ProfileBlock({ block }: { block: Extract<CMSBlock, { blockType: "profil
           )}
           <h2 className="text-3xl font-bold">{block.name}</h2>
           {block.description && (
-            <p className="max-w-2xl text-muted-foreground">{block.description}</p>
+            <p className="max-w-2xl text-muted-foreground">
+              {block.description}
+            </p>
           )}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function ProductGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "productGrid" }> }) {
+function ProductGridBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "productGrid" }>;
+}) {
   return (
     <section className="w-full py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -138,7 +308,9 @@ function ProductGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "pr
               )}
               <div>
                 <h3 className="text-xl font-semibold">{item.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
               {item.projectLink && (
                 <a
@@ -153,10 +325,14 @@ function ProductGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "pr
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function WorkGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "workGrid" }> }) {
+function WorkGridBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "workGrid" }>;
+}) {
   return (
     <section className="w-full py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -175,7 +351,9 @@ function WorkGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "workG
               )}
               <div>
                 <h3 className="text-xl font-semibold">{item.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
               <div className="mt-auto flex gap-3">
                 {item.projectLink && (
@@ -200,5 +378,5 @@ function WorkGridBlock({ block }: { block: Extract<CMSBlock, { blockType: "workG
         </div>
       </div>
     </section>
-  )
+  );
 }
