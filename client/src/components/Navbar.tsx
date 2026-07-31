@@ -137,7 +137,7 @@ function DesktopDropdownItem({ navLink }: { navLink: CMSNavLink }) {
 
   return (
     <div className="group/sub relative">
-      <div className="flex items-center justify-between rounded-md px-3 py-2 text-base text-red-500 hover:bg-muted hover:underline transition-colors">
+      <div className="flex items-center justify-between rounded-md px-3 py-2 text-base text-foreground hover:bg-muted hover:underline transition-colors">
         {link.url ? (
           <NavLinkAnchor
             label={link.label}
@@ -172,7 +172,7 @@ function DesktopNavItem({ navLink }: { navLink: CMSNavLink }) {
         label={link.label}
         url={link.url}
         newTab={link.newTab}
-        className="text-2xl font-medium text-foreground underline-offset-4 hover:underline transition-colors whitespace-nowrap"
+        className="text-lg font-bold text-foreground underline-offset-4 hover:underline transition-colors whitespace-nowrap"
       />
     );
   }

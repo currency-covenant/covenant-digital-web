@@ -123,4 +123,11 @@
   }
 }
 
+/* Custom cursor */
+html,
+body,
+* {
+  cursor: none !important;
+}
+
 

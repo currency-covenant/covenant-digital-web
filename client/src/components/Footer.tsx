@@ -90,7 +90,7 @@ function FooterColumn({ column }: { column: CMSFooterColumn }) {
           <li key={item.id ?? i}>
             <FooterLinkAnchor
               link={item.link}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm text-foreground transition-colors hover:text-foreground/80"
             />
           </li>
         ))}
@@ -151,7 +151,7 @@ function NewsletterForm({
             onChange={(e) => setEmail(e.target.value)}
             placeholder={placeholder}
             required
-            className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+            className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-foreground/70 focus:border-ring focus:ring-1 focus:ring-ring"
           />
           <Button
             type="submit"
@@ -162,10 +162,10 @@ function NewsletterForm({
             {status === "loading" ? "Subscribing..." : buttonLabel}
           </Button>
         </div>
-        {message && (
+          {message && (
           <p
             className={`text-sm ${
-              status === "error" ? "text-destructive" : "text-muted-foreground"
+              status === "error" ? "text-destructive" : "text-foreground"
             }`}
           >
             {message}
@@ -230,7 +230,7 @@ export function Footer() {
               </Link>
             )}
             {footer.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed">
                 {footer.description}
               </p>
             )}
@@ -244,7 +244,7 @@ export function Footer() {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-foreground transition-colors hover:text-foreground/80"
                       aria-label={item.platform}
                     >
                       <Icon className="size-5" />
@@ -274,7 +274,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col justify-between gap-4 border-t border-border pt-8 md:flex-row">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground">
             {footer.copyrightText ?? ""}
           </p>
           {footer.legalLinks && footer.legalLinks.length > 0 && (
@@ -283,7 +283,7 @@ export function Footer() {
                 <FooterLinkAnchor
                   key={item.id ?? i}
                   link={item.link}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-sm text-foreground transition-colors hover:text-foreground/80"
                 />
               ))}
             </div>
