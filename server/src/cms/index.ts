@@ -1,5 +1,8 @@
 import { Hono } from "hono"
 import type {
+  CMSFooter,
+  CMSFooterColumn,
+  CMSFooterSocialLink,
   CMSHeader,
   CMSLink,
   CMSMedia,
@@ -202,6 +205,91 @@ cmsRoutes.get("/header", async (c) => {
   }
 
   return c.json(header)
+})
+
+cmsRoutes.get("/footer", async (c) => {
+  const cmsUrl = env(c, "CMS_URL")
+  const tenantId = env(c, "CMS_TENANT_ID")
+
+  if (!cmsUrl) {
+    return c.json({ error: "CMS_URL not configured" }, 500)
+  }
+  if (!tenantId) {
+    return c.json({ error: "CMS_TENANT_ID not configured" }, 500)
+  }
+
+  const url = `${cmsUrl}/api/footer?depth=4&where[tenant][equals]=${encodeURIComponent(tenantId)}&limit=1`
+
+  let res: Response
+  try {
+    res = await fetch(url, {
+      headers: { "Content-Type": "application/json" },
+    })
+  } catch {
+    return c.json({ error: "CMS unreachable" }, 502)
+  }
+
+  if (!res.ok) {
+    return c.json({ error: "CMS fetch failed" }, res.status as any)
+  }
+
+  const json = (await res.json()) as { docs?: Record<string, unknown>[] }
+  const doc = json.docs?.[0]
+  if (!doc) {
+    return c.json(null)
+  }
+
+  const columnsRaw = (doc.columns as Record<string, unknown>[] | undefined) ?? []
+  const columns: CMSFooterColumn[] = columnsRaw.map((column) => {
+    const linksRaw = (column.links as Record<string, unknown>[] | undefined) ?? []
+    return {
+      id: (column.id as string) ?? null,
+      title: (column.title as string) ?? "",
+      links: linksRaw.map((item) => ({
+        id: (item.id as string) ?? null,
+        link: resolveLink((item.link as Record<string, unknown>) ?? {}),
+      })),
+    }
+  })
+
+  const socialLinksRaw = (doc.socialLinks as Record<string, unknown>[] | undefined) ?? []
+  const socialLinks: CMSFooterSocialLink[] = socialLinksRaw.map((item) => ({
+    id: (item.id as string) ?? null,
+    platform: (item.platform as CMSFooterSocialLink["platform"]) ?? "twitter",
+    url: (item.url as string) ?? "",
+  }))
+
+  const legalLinksRaw = (doc.legalLinks as Record<string, unknown>[] | undefined) ?? []
+  const legalLinks = legalLinksRaw.map((item) => ({
+    id: (item.id as string) ?? null,
+    link: resolveLink((item.link as Record<string, unknown>) ?? {}),
+  }))
+
+  const footer: CMSFooter = {
+    id: doc.id as number,
+    title: (doc.title as string) ?? "",
+    description: (doc.description as string | undefined) ?? null,
+    socialLinks,
+    columns,
+    newsletterHeading: (doc.newsletterHeading as string | undefined) ?? null,
+    newsletterPlaceholder: (doc.newsletterPlaceholder as string | undefined) ?? null,
+    newsletterButtonLabel: (doc.newsletterButtonLabel as string | undefined) ?? null,
+    copyrightText: (doc.copyrightText as string | undefined) ?? null,
+    legalLinks,
+    logo: doc.logo
+      ? ({
+          id: (doc.logo as Record<string, unknown>).id as number,
+          url: (doc.logo as Record<string, unknown>).url as string,
+          alt: (doc.logo as Record<string, unknown>).alt as string | null,
+          filename: (doc.logo as Record<string, unknown>).filename as string,
+          mimeType: (doc.logo as Record<string, unknown>).mimeType as string,
+          width: (doc.logo as Record<string, unknown>).width as number,
+          height: (doc.logo as Record<string, unknown>).height as number,
+        } as CMSMedia)
+      : null,
+  }
+
+  return c.json(footer)
 })
 
 cmsRoutes.get("/pages/:slug", async (c) => {

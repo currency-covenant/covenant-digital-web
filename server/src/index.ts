@@ -2,6 +2,7 @@ import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
 import { cmsRoutes } from "./cms"
+import { newsletterRoutes } from "./cms/newsletter"
 import { renderRoutes } from "./render"
 
 const app = new Hono()
@@ -33,6 +34,7 @@ app.use(
 )
 
 app.route("/cms", cmsRoutes)
+app.route("/newsletter", newsletterRoutes)
 app.route("/rsc", renderRoutes)
 
 app.get("/", (c) => {

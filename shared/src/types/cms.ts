@@ -30,6 +30,37 @@ export interface CMSHeader {
   logo?: CMSMedia | null
 }
 
+export interface CMSFooterLink {
+  id?: string | null
+  link: CMSLink
+}
+
+export interface CMSFooterColumn {
+  id?: string | null
+  title: string
+  links?: CMSFooterLink[] | null
+}
+
+export interface CMSFooterSocialLink {
+  id?: string | null
+  platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'youtube' | 'github'
+  url: string
+}
+
+export interface CMSFooter {
+  id: number
+  title: string
+  logo?: CMSMedia | null
+  description?: string | null
+  socialLinks?: CMSFooterSocialLink[] | null
+  columns: CMSFooterColumn[]
+  newsletterHeading?: string | null
+  newsletterPlaceholder?: string | null
+  newsletterButtonLabel?: string | null
+  copyrightText?: string | null
+  legalLinks?: CMSFooterLink[] | null
+}
+
 /* ── Block Types ── */
 
 export interface CMSCTALink {
@@ -123,6 +154,18 @@ export interface CMSFormBlock {
   introContent?: string | null
 }
 
+export interface CMSMarqueeItem {
+  id?: string | null
+  title: string
+  icon?: string | null
+  uploadIcon?: CMSMedia | null
+}
+
+export interface CMSMarqueeBlock {
+  blockType: "marquee"
+  items: CMSMarqueeItem[]
+}
+
 export type CMSBlock =
   | CMSContentBlock
   | CMSCTABlock
@@ -133,6 +176,7 @@ export type CMSBlock =
   | CMSWorkGridBlock
   | CMSArchiveBlock
   | CMSFormBlock
+  | CMSMarqueeBlock
 
 /* ── Hero ── */
 

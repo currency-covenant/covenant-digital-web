@@ -1,5 +1,7 @@
-import type { CMSBlock, CMSLink } from "shared";
+import type { CMSBlock, CMSLink, CMSMarqueeItem } from "shared";
 import { ArrowRight } from "lucide-react";
+import * as SiIcons from "react-icons/si";
+import { Marquee } from "@/components/ui/marquee";
 
 export function RenderBlock({ block }: { block: CMSBlock }) {
   switch (block.blockType) {
@@ -17,6 +19,8 @@ export function RenderBlock({ block }: { block: CMSBlock }) {
       return <ProductGridBlock block={block} />;
     case "workGrid":
       return <WorkGridBlock block={block} />;
+    case "marquee":
+      return <MarqueeBlock block={block} />;
     default:
       return null;
   }
@@ -379,4 +383,59 @@ function WorkGridBlock({
       </div>
     </section>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Marquee                                                           */
+/* ------------------------------------------------------------------ */
+
+const iconMap: Record<string, React.ComponentType<{ size?: number; title?: string; className?: string }>> =
+  SiIcons as unknown as Record<string, React.ComponentType<{ size?: number; title?: string; className?: string }>>
+
+function resolveIcon(slug: string | null | undefined) {
+  if (!slug) return null
+  // react-icons/si exports components like SiReact, SiNextdotjs, etc.
+  const key = `Si${slug.charAt(0).toUpperCase() + slug.slice(1)}`
+  return iconMap[key] ?? null
+}
+
+function MarqueeItem({ item }: { item: CMSMarqueeItem }) {
+  const { title, icon, uploadIcon } = item
+  const IconComponent = !uploadIcon?.url && icon ? resolveIcon(icon) : null
+
+  return (
+    <span className="inline-flex items-center px-6 text-foreground">
+      {uploadIcon?.url ? (
+        <img
+          src={uploadIcon.url}
+          alt={uploadIcon.alt ?? title}
+          width={48}
+          height={48}
+          className="size-12 object-contain"
+        />
+      ) : IconComponent ? (
+        <IconComponent size={48} title={title} className="text-white" />
+      ) : null}
+    </span>
+  )
+}
+
+function MarqueeBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "marquee" }>;
+}) {
+  if (!block.items || block.items.length === 0) return null
+
+  return (
+    <section className="relative w-full border-y border-border bg-background py-6">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent" />
+      <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem]">
+        {block.items.map((item, i) => (
+          <MarqueeItem key={i} item={item} />
+        ))}
+      </Marquee>
+    </section>
+  )
 }

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCMSPage } from "@/hooks/server/cms/GET/useCMSPage";
 import { RenderBlock, CTAButton } from "@/components/cms/render-block";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { CMSBlock, CMSCTAButtonBlock } from "shared";
+import type { CMSBlock, CMSCTAButtonBlock, CMSMarqueeBlock } from "shared";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -42,11 +42,15 @@ function HomePage() {
   const layout = page.layout ?? [];
   const heroCtaButtons: CMSCTAButtonBlock[] = [];
   const remainingBlocks: CMSBlock[] = [];
+  let marqueeBlock: CMSMarqueeBlock | null = null;
 
   let collectingHeroCtas = true;
   for (const block of layout) {
     if (collectingHeroCtas && block.blockType === "ctaButton") {
       heroCtaButtons.push(block as CMSCTAButtonBlock);
+    } else if (!marqueeBlock && block.blockType === "marquee") {
+      collectingHeroCtas = false;
+      marqueeBlock = block as CMSMarqueeBlock;
     } else {
       collectingHeroCtas = false;
       remainingBlocks.push(block);
@@ -81,6 +85,11 @@ function HomePage() {
           </section>
         </div>
       )}
+
+      {marqueeBlock && (
+        <RenderBlock block={marqueeBlock} />
+      )}
+
       {remainingBlocks.map((block, i) => (
         <RenderBlock key={i} block={block} />
       ))}
