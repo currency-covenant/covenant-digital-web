@@ -92,22 +92,22 @@ function HomePage() {
 
       {marqueeBlock && (
         <>
-          <div className="h-16 w-full bg-background " />
+          <div className="h-16 w-full bg-foreground " />
           <RenderBlock block={marqueeBlock} />
-          <div className="h-16 w-full bg-background " />
+          <div className="h-16 w-full bg-foreground " />
         </>
       )}
-
+          <div className="h-16 w-full bg-background" />
       {linkListBlock && (
         <>
         <RenderBlock block={linkListBlock} />
                   <div className="h-16 w-full bg-background " />
         </>
                   )}
-
       {remainingBlocks.map((block, i) => (
         <RenderBlock key={i} block={block} />
       ))}
+                              <div className="h-16 w-full bg-background" />
     </div>
   );
 }

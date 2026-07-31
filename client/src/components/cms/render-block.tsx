@@ -1,4 +1,4 @@
-import type { CMSBlock, CMSLink, CMSMarqueeItem } from "shared";
+import type { CMSBlock, CMSLink, CMSMarqueeItem, CMSTechStackItem } from "shared";
 import { ArrowRight } from "lucide-react";
 import * as SiIcons from "react-icons/si";
 import { Marquee } from "@/components/ui/marquee";
@@ -24,6 +24,8 @@ export function RenderBlock({ block }: { block: CMSBlock }) {
       return <MarqueeBlock block={block} />;
     case "linkList":
       return <LinkListBlock block={block} />;
+    case "techStack":
+      return <TechStackBlock block={block} />;
     default:
       return null;
   }
@@ -414,10 +416,10 @@ function MarqueeItem({ item }: { item: CMSMarqueeItem }) {
           alt={uploadIcon.alt ?? title}
           width={48}
           height={48}
-          className="size-24 object-contain"
+          className="size-20 object-contain"
         />
       ) : IconComponent ? (
-        <IconComponent size={48} title={title} className="text-white" />
+        <IconComponent size={72} title={title} className="text-background" />
       ) : null}
     </span>
   )
@@ -431,9 +433,9 @@ function MarqueeBlock({
   if (!block.items || block.items.length === 0) return null
 
   return (
-    <section className="relative w-full bg-background my-32 h-full">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-40 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-40 bg-gradient-to-l from-background to-transparent" />
+    <section className="relative w-full bg-foreground my-32 h-full">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-40 bg-gradient-to-r from-foreground to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-40 bg-gradient-to-l from-foreground to-transparent" />
       <Marquee pauseOnHover className="[--duration:30s] [--gap:4rem]">
         {block.items.map((item, i) => (
           <MarqueeItem key={i} item={item} />
@@ -503,7 +505,7 @@ function LinkListBlock({
                   {item.link.url ? (
                     <LinkListItemAnchor
                       link={item.link}
-                      className="text-foreground transition-colors hover:text-red-500"
+                      className="text-foreground transition-colors hover:text-primary"
                     >
                       {item.title}
                     </LinkListItemAnchor>
@@ -513,7 +515,7 @@ function LinkListBlock({
                     </span>
                   )}
                 </div>
-                <p className="text-base md:text-lg text-muted-foreground sm:w-96 md:w-2/4 sm:shrink-0 sm:text-left">
+                <p className="text-base md:text-lg text-foreground sm:w-96 md:w-2/4 sm:shrink-0 sm:text-left">
                   {item.description}
                 </p>
               </div>
@@ -521,6 +523,104 @@ function LinkListBlock({
           ))}
         </div>
       </div>
+    </section>
+  )
+}
+
+function parseDevicon(devicon?: string | null): { name: string; logoStyle: string } | null {
+  if (!devicon) return null
+  const parts = devicon.trim().split(/\s+/)
+  const classToken = parts.find((p) => p.startsWith("devicon-")) ?? parts[0]
+  if (!classToken) return null
+  const withoutPrefix = classToken.replace("devicon-", "")
+  const segments = withoutPrefix.split("-")
+  if (segments.length < 2) return null
+  const logoStyle = segments.pop()!
+  const name = segments.join("-")
+  return { name, logoStyle }
+}
+
+function TechStackItem({ item }: { item: CMSTechStackItem }) {
+  const { title, icon, devicon, uploadIcon } = item
+  const IconComponent = !uploadIcon?.url && !devicon && icon ? resolveIcon(icon) : null
+  const deviconProps = parseDevicon(devicon)
+
+  return (
+    <div className="flex flex-col items-center gap-2 text-center text-background">
+      <div className="flex h-16 items-center justify-center">
+        {uploadIcon?.url ? (
+          <img
+            src={uploadIcon.url}
+            alt={uploadIcon.alt ?? title}
+            width={40}
+            height={40}
+            className="size-10 object-contain"
+          />
+        ) : deviconProps ? (
+          <img
+            src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${deviconProps.name}/${deviconProps.name}-${deviconProps.logoStyle}.svg`}
+            alt={title}
+            width={40}
+            height={40}
+            className="size-10 object-contain"
+          />
+        ) : IconComponent ? (
+          <IconComponent size={40} title={title} className="text-background" />
+        ) : null}
+      </div>
+      <span className="text-base font-medium">{title}</span>
+    </div>
+  )
+}
+
+function TechStackBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "techStack" }>;
+}) {
+  if (!block.items || block.items.length === 0) return null
+
+  const rows = block.items.reduce<Record<number, CMSTechStackItem[]>>((acc, item) => {
+    const row = item.row ?? 1
+    if (!acc[row]) acc[row] = []
+    acc[row].push(item)
+    return acc
+  }, {})
+
+  const sortedRowNumbers = Object.keys(rows)
+    .map(Number)
+    .sort((a, b) => a - b)
+
+  return (
+    <section className="w-full flex flex-col justify-center items-center bg-foreground py-16">
+                        <div className="h-8 w-full bg-foreground" />
+      <div className="mx-auto  px-4 sm:px-6 lg:px-8">
+        {block.title && (
+          <h2 className=" text-6xl font-bold tracking-tight text-background flex justify-center">
+            {block.title}
+          </h2>
+        )}
+                  <div className="h-8 w-full bg-foreground" />
+        {block.description && (
+          <p className="mb-8 text-2xl text-background flex justify-center text-center max-w-screen-2xl w-full">
+            {block.description}
+          </p>
+        )}
+                          <div className="h-12 w-full bg-foreground" />
+        <div className="flex flex-col items-center justify-center gap-16 divide-y divide-background/20">
+          {sortedRowNumbers.map((rowNumber) => (
+            <div
+              key={rowNumber}
+              className="grid grid-cols-2 gap-16 md:grid-cols-4 lg:grid-cols-6"
+            >
+              {rows[rowNumber].map((item, i) => (
+                <TechStackItem key={item.id ?? i} item={item} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+                        <div className="h-8 w-full bg-foreground" />
     </section>
   )
 }

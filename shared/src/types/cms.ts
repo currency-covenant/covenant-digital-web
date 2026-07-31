@@ -179,6 +179,22 @@ export interface CMSLinkListBlock {
   links: CMSLinkListItem[]
 }
 
+export interface CMSTechStackItem {
+  id?: string | null
+  row?: number | null
+  title: string
+  icon?: string | null
+  devicon?: string | null
+  uploadIcon?: CMSMedia | null
+}
+
+export interface CMSTechStackBlock {
+  blockType: "techStack"
+  title: string
+  description?: string | null
+  items: CMSTechStackItem[]
+}
+
 export type CMSBlock =
   | CMSContentBlock
   | CMSCTABlock
@@ -191,6 +207,7 @@ export type CMSBlock =
   | CMSFormBlock
   | CMSMarqueeBlock
   | CMSLinkListBlock
+  | CMSTechStackBlock
 
 /* ── Hero ── */
 

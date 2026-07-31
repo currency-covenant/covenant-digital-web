@@ -267,7 +267,7 @@ export function Navbar() {
   const navLinks = header?.navLinks ?? [];
 
   return (
-    <header className="sticky px-8 top-0 flex justify-center items-center w-full border-b border-white/[3%] bg-background/70 backdrop-blur-xl shadow-lg">
+    <header className="sticky z-50 px-8 top-0 flex justify-center items-center w-full border-b border-white/[3%] bg-background/70 backdrop-blur-xl shadow-lg">
       <div className="flex h-16 items-center gap-4 mx-auto max-w-screen-2xl w-full">
         {/* Left 1/3: Logo */}
         <div className="flex items-center shrink-0">
