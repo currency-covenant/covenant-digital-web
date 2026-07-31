@@ -166,6 +166,19 @@ export interface CMSMarqueeBlock {
   items: CMSMarqueeItem[]
 }
 
+export interface CMSLinkListItem {
+  id?: string | null
+  title: string
+  description: string
+  link: CMSLink
+}
+
+export interface CMSLinkListBlock {
+  blockType: "linkList"
+  title: string
+  links: CMSLinkListItem[]
+}
+
 export type CMSBlock =
   | CMSContentBlock
   | CMSCTABlock
@@ -177,6 +190,7 @@ export type CMSBlock =
   | CMSArchiveBlock
   | CMSFormBlock
   | CMSMarqueeBlock
+  | CMSLinkListBlock
 
 /* ── Hero ── */
 

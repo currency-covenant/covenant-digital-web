@@ -136,6 +136,17 @@ function transformLayoutBlocks(
       }
     }
 
+    if (blockType === "linkList") {
+      const linksRaw = (block.links as Record<string, unknown>[] | undefined) ?? []
+      return {
+        ...block,
+        links: linksRaw.map((item) => ({
+          ...item,
+          link: resolveLink((item.link as Record<string, unknown>) ?? {}),
+        })),
+      }
+    }
+
     return block
   })
 }

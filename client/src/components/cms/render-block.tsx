@@ -2,6 +2,7 @@ import type { CMSBlock, CMSLink, CMSMarqueeItem } from "shared";
 import { ArrowRight } from "lucide-react";
 import * as SiIcons from "react-icons/si";
 import { Marquee } from "@/components/ui/marquee";
+import { useInView } from "@/hooks/useInView";
 
 export function RenderBlock({ block }: { block: CMSBlock }) {
   switch (block.blockType) {
@@ -21,6 +22,8 @@ export function RenderBlock({ block }: { block: CMSBlock }) {
       return <WorkGridBlock block={block} />;
     case "marquee":
       return <MarqueeBlock block={block} />;
+    case "linkList":
+      return <LinkListBlock block={block} />;
     default:
       return null;
   }
@@ -411,7 +414,7 @@ function MarqueeItem({ item }: { item: CMSMarqueeItem }) {
           alt={uploadIcon.alt ?? title}
           width={48}
           height={48}
-          className="size-12 object-contain"
+          className="size-24 object-contain"
         />
       ) : IconComponent ? (
         <IconComponent size={48} title={title} className="text-white" />
@@ -428,14 +431,96 @@ function MarqueeBlock({
   if (!block.items || block.items.length === 0) return null
 
   return (
-    <section className="relative w-full border-y border-border bg-background py-6">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent" />
-      <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem]">
+    <section className="relative w-full bg-background my-32 h-full">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-40 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-40 bg-gradient-to-l from-background to-transparent" />
+      <Marquee pauseOnHover className="[--duration:30s] [--gap:4rem]">
         {block.items.map((item, i) => (
           <MarqueeItem key={i} item={item} />
         ))}
       </Marquee>
+    </section>
+  )
+}
+
+function LinkListItemAnchor({
+  link,
+  children,
+  className,
+}: {
+  link: CMSLink
+  children: React.ReactNode
+  className?: string
+}) {
+  const href = link.url ?? "#"
+  const isHash = href.startsWith("#")
+
+  return (
+    <a
+      href={href}
+      target={!isHash && link.newTab ? "_blank" : undefined}
+      rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
+      className={className}
+    >
+      {children}
+    </a>
+  )
+}
+
+function LinkListBlock({
+  block,
+}: {
+  block: Extract<CMSBlock, { blockType: "linkList" }>;
+}) {
+  const { ref, isInView } = useInView<HTMLElement>({ threshold: 0.1 })
+
+  if (!block.links || block.links.length === 0) return null
+
+  return (
+    <section ref={ref} className="w-full flex justify-center py-16">
+      <div className="max-w-screen-2xl w-full px-4 sm:px-6 lg:px-8 ">
+        {block.title && (
+          <h2 className="mb-16 text-5xl whitespace-nowrap font-bold tracking-tight text-foreground ">
+            {block.title}
+          </h2>
+        )}
+                  <div className="h-12 w-full bg-background " />
+        <div className="grid gap-8">
+          {block.links.map((item, i) => (
+            <div
+              key={item.id ?? i}
+              className={
+                "transition-all duration-300 ease-out " +
+                (isInView
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-6")
+              }
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
+              <div className="flex flex-col items-start justify-between gap-20 p-16 sm:flex-row sm:items-center">
+                <div className="flex items-baseline gap-3 text-2xl font-semibold sm:flex-1 sm:min-w-0">
+                  <span className="select-none text-xl text-muted-foreground">{i + 1}.</span>
+                  {item.link.url ? (
+                    <LinkListItemAnchor
+                      link={item.link}
+                      className="text-foreground transition-colors hover:text-red-500"
+                    >
+                      {item.title}
+                    </LinkListItemAnchor>
+                  ) : (
+                    <span className="text-foreground">
+                      {item.title}
+                    </span>
+                  )}
+                </div>
+                <p className="text-base md:text-lg text-muted-foreground sm:w-96 md:w-2/4 sm:shrink-0 sm:text-left">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   )
 }

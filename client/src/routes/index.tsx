@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCMSPage } from "@/hooks/server/cms/GET/useCMSPage";
 import { RenderBlock, CTAButton } from "@/components/cms/render-block";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { CMSBlock, CMSCTAButtonBlock, CMSMarqueeBlock } from "shared";
+import type { CMSBlock, CMSCTAButtonBlock, CMSLinkListBlock, CMSMarqueeBlock } from "shared";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -43,6 +43,7 @@ function HomePage() {
   const heroCtaButtons: CMSCTAButtonBlock[] = [];
   const remainingBlocks: CMSBlock[] = [];
   let marqueeBlock: CMSMarqueeBlock | null = null;
+  let linkListBlock: CMSLinkListBlock | null = null;
 
   let collectingHeroCtas = true;
   for (const block of layout) {
@@ -51,6 +52,9 @@ function HomePage() {
     } else if (!marqueeBlock && block.blockType === "marquee") {
       collectingHeroCtas = false;
       marqueeBlock = block as CMSMarqueeBlock;
+    } else if (!linkListBlock && block.blockType === "linkList") {
+      collectingHeroCtas = false;
+      linkListBlock = block as CMSLinkListBlock;
     } else {
       collectingHeroCtas = false;
       remainingBlocks.push(block);
@@ -87,8 +91,19 @@ function HomePage() {
       )}
 
       {marqueeBlock && (
-        <RenderBlock block={marqueeBlock} />
+        <>
+          <div className="h-16 w-full bg-background " />
+          <RenderBlock block={marqueeBlock} />
+          <div className="h-16 w-full bg-background " />
+        </>
       )}
+
+      {linkListBlock && (
+        <>
+        <RenderBlock block={linkListBlock} />
+                  <div className="h-16 w-full bg-background " />
+        </>
+                  )}
 
       {remainingBlocks.map((block, i) => (
         <RenderBlock key={i} block={block} />
