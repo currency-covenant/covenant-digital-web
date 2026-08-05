@@ -70,7 +70,7 @@ function HomePage() {
       {(hasHeroContent || hasHeroCtas) && (
         <div
           style={{ paddingTop: "120px", paddingBottom: "120px" }}
-          className="w-full flex justify-center bg-black px-8"
+          className="w-full flex justify-center bg-background px-8"
         >
           <section className="mx-auto flex w-full max-w-screen-2xl flex-col items-center py-16">
             {hasHeroContent && (
