@@ -31,29 +31,6 @@ export function RenderBlock({ block }: { block: CMSBlock }) {
   }
 }
 
-function CTALinkAnchor({
-  link,
-  className = "inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-foreground hover:bg-primary hover:text-background transition-colors",
-}: {
-  link: CMSLink;
-  className?: string;
-}) {
-  const href = link.url ?? "#";
-  const isHash = href.startsWith("#");
-
-  return (
-    <a
-      href={href}
-      target={!isHash && link.newTab ? "_blank" : undefined}
-      rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
-      className={className}
-    >
-      {link.label}
-      <ArrowRight className="size-4 shrink-0" />
-    </a>
-  );
-}
-
 export function CTAButton({
   link,
 }: {
@@ -63,101 +40,15 @@ export function CTAButton({
   const isHash = href.startsWith("#");
 
   return (
-    <>
-      <style>{`
-        .hero-btn-glow {
-          align-items: center;
-          appearance: none;
-          background-clip: padding-box;
-          background-color: initial;
-          background-image: none;
-          border-style: none;
-          box-sizing: border-box;
-          color: var(--primary-foreground);
-          cursor: pointer;
-          display: inline-flex;
-          flex-direction: row;
-          flex-shrink: 0;
-          font-family: Eina01, sans-serif;
-          font-size: 16px;
-          font-weight: 800;
-          justify-content: center;
-          line-height: 24px;
-          margin: 0;
-          min-height: 64px;
-          outline: none;
-          overflow: visible;
-          padding: 19px 26px;
-          pointer-events: auto;
-          position: relative;
-          text-align: center;
-          text-decoration: none;
-          text-transform: none;
-          user-select: none;
-          -webkit-user-select: none;
-          touch-action: manipulation;
-          vertical-align: middle;
-          width: auto;
-          word-break: keep-all;
-          z-index: 0;
-        }
-        @media (min-width: 768px) {
-          .hero-btn-glow {
-            padding: 19px 32px;
-          }
-        }
-        .hero-btn-glow::before,
-        .hero-btn-glow::after {
-          border-radius: 80px;
-        }
-        .hero-btn-glow::before {
-          background-image: linear-gradient(92.83deg, var(--accent) 0, var(--primary) 100%);
-          content: "";
-          display: block;
-          height: 100%;
-          left: 0;
-          overflow: hidden;
-          position: absolute;
-          top: 0;
-          width: 100%;
-          z-index: -2;
-        }
-        .hero-btn-glow::after {
-          background-color: initial;
-          background-image: linear-gradient(var(--muted) 0, var(--background) 100%);
-          bottom: 4px;
-          content: "";
-          display: block;
-          left: 4px;
-          overflow: hidden;
-          position: absolute;
-          right: 4px;
-          top: 4px;
-          transition: all 100ms ease-out;
-          z-index: -1;
-        }
-        .hero-btn-glow:hover::after {
-          bottom: 0;
-          left: 0;
-          right: 0;
-          top: 0;
-          transition-timing-function: ease-in;
-          opacity: 0;
-        }
-        .hero-btn-glow:active {
-          color: var(--muted-foreground);
-        }
-      `}</style>
-      <a
-        href={href}
-        target={!isHash && link.newTab ? "_blank" : undefined}
-        rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
-        className="hero-btn-glow"
-      >
-        {link.label}
-        <ArrowRight className="size-6 shrink-0" />
-      </a>
-    </>
+    <a
+      href={href}
+      target={!isHash && link.newTab ? "_blank" : undefined}
+      rel={!isHash && link.newTab ? "noopener noreferrer" : undefined}
+      className="hero-btn-glow"
+    >
+      {link.label}
+      <ArrowRight className="size-6 shrink-0" />
+    </a>
   )
 }
 
@@ -203,18 +94,18 @@ function CTABlock({
       )}
       <div className="relative px-8">
         <div
-          className="prose prose-invert max-w-none text-center"
+          className="prose prose-2xl prose-invert max-w-none text-center"
           dangerouslySetInnerHTML={{ __html: block.richText }}
         />
         {block.links && block.links.length > 0 && (
           <div className="mt-8 flex w-full flex-col items-center gap-6">
             <div className="flex justify-center w-full">
-              <CTALinkAnchor link={block.links[0].link} />
+              <CTAButton link={block.links[0].link} />
             </div>
             {block.links.length > 1 && (
               <div className="flex items-center justify-center gap-4 w-full">
                 {block.links.slice(1).map((link, i) => (
-                  <CTALinkAnchor key={i} link={link.link} />
+                  <CTAButton key={i} link={link.link} />
                 ))}
               </div>
             )}

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCMSPage } from "@/hooks/server/cms/GET/useCMSPage";
 import { RenderBlock, CTAButton } from "@/components/cms/render-block";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Globe } from "@/components/ui/globe";
 import type { CMSBlock, CMSCTAButtonBlock, CMSLinkListBlock, CMSMarqueeBlock } from "shared";
 
 export const Route = createFileRoute("/")({
@@ -72,20 +73,27 @@ function HomePage() {
           style={{ paddingTop: "120px", paddingBottom: "120px" }}
           className="w-full flex justify-center bg-background px-8"
         >
-          <section className="mx-auto flex w-full max-w-screen-2xl flex-col items-center py-16">
-            {hasHeroContent && (
-              <div
-                className="prose prose-invert prose-2xl w-full max-w-none! text-left"
-                dangerouslySetInnerHTML={{ __html: heroRichText }}
-              />
-            )}
-            {hasHeroCtas && (
-              <div style={{paddingTop: "32px"}} className=" flex w-full items-center justify-start gap-6">
-                {heroCtaButtons.map((block, i) => (
-                  <CTAButton key={i} link={block.link} />
-                ))}
+          <section className="mx-auto grid w-full max-w-screen-2xl items-center gap-12 py-16 md:grid-cols-2">
+            <div className="flex flex-col items-start">
+              {hasHeroContent && (
+                <div
+                  className="prose prose-invert prose-2xl w-full max-w-none! text-left"
+                  dangerouslySetInnerHTML={{ __html: heroRichText }}
+                />
+              )}
+              {hasHeroCtas && (
+                <div style={{ paddingTop: "32px" }} className="flex w-full items-center justify-start gap-6">
+                  {heroCtaButtons.map((block, i) => (
+                    <CTAButton key={i} link={block.link} />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="hidden items-center justify-center md:flex">
+              <div className="relative h-[400px] w-[400px]">
+                <Globe />
               </div>
-            )}
+            </div>
           </section>
         </div>
       )}

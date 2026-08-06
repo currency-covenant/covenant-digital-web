@@ -21,7 +21,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["react", "react-dom", "lucide-react", "clsx", "tailwind-merge"],
+    include: ["react", "react-dom", "lucide-react", "clsx", "tailwind-merge", "cobe", "motion"],
     exclude: ["server", "shared"],
   },
 })
